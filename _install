@@ -1,0 +1,33 @@
+#!/bin/bash
+
+#
+# Install evdev into virtual environment
+#
+python3 -m venv virt-env
+. ./virt-env/bin/activate
+pip install evdev
+
+sudo addgroup uinput
+#
+# Makeu /dev/uinput readable for users in group uinput:
+#
+sudo sh -c 'echo SUBSYSTEM==\"misc\", KERNEL==\"uinput\", MODE=\"0660\", GROUP=\"uinput\" > /etc/udev/rules.d/99-input.rules'
+
+sudo usermod -a -G  input $USER
+sudo usermod -a -G uinput $USER
+
+#
+# Start keyboard mapper when logging in
+#
+dir="$(dirname "$(readlink -f "$0")")"
+
+mkdir -p $HOME/.config/autostart
+cat <<TF > ~/.config/autostart/evdev.desktop
+[Desktop Entry]
+Type=Application
+Name=Python evdev keyboard mapper
+Version=1.5
+Exec=$dir/start
+Terminal=true
+StartupNotify=false
+TF
