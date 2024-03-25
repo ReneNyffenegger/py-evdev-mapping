@@ -4,8 +4,18 @@ import evdev
 import sys
 
 def grab_device(dev_name): # {{{
+    dev_ = [ devobj for devobj in [ evdev.InputDevice(devpath) for devpath in evdev.list_devices() ] if devobj.name == dev_name ]
 
-    dev = [ devobj for devobj in [ evdev.InputDevice(devpath) for devpath in evdev.list_devices() ] if devobj.name == dev_name ][0]
+  #
+  # Check if at least one device with the indicated name was found:
+  #
+    if dev_ == []:
+       return None
+
+  #
+  # The device is the first (and hopefully only) element in the list:
+  #
+    dev = dev_[0]
   #
   # We want to handle the device's original events ourselves and
   # thus do not want the device to emit these events:
@@ -22,7 +32,17 @@ def grab_device(dev_name): # {{{
 
 
 dv_kb = grab_device('LITEON Technology USB Multimedia Keyboard')
+if dv_kb == None:
+   dv_kb = grab_device('AT Translated Set 2 keyboard')
+
 dv_ms = grab_device('USB OPTICAL MOUSE '                       ) # Note the final space
+if dv_ms == None:
+ # dv_ms = grab_device('SYNA8004:00 06CB:CD8B Touchpad')
+   dv_ms = grab_device('SYNA8004:00 06CB:CD8B Mouse'   )
+
+if dv_kb == None or dv_ms == None:
+   print('Either Mouse or Keyboard (or both) not found')
+   sys.exit(1)
 
 print( "[2J") # Clear screen
 print(f'[1;1HKeyboard at {dv_kb.path}')
@@ -30,7 +50,7 @@ print(f'[2;1HMouse    at {dv_ms.path}')
 
 left_alt_suppressed = False
 
-vdev = evdev.UInput.from_device(dv_kb, dv_ms, name='virt-device', version=3) 
+vdev = evdev.UInput.from_device(dv_kb, dv_ms, name='virt-device', version=3)
 
 def write_hex(keys): # {{{
 
@@ -49,7 +69,7 @@ def write_hex(keys): # {{{
 
     vdev.write(evdev.ecodes.EV_KEY, evdev.ecodes.KEY_SPACE    , 1)
     vdev.write(evdev.ecodes.EV_KEY, evdev.ecodes.KEY_SPACE    , 0)
-    
+
 # }}}
 
 async def handle_events(dev): # {{{
@@ -58,7 +78,7 @@ async def handle_events(dev): # {{{
 
     async for ev in dev.async_read_loop():
         if ev.type == evdev.ecodes.EV_KEY:  # {{{ Process key events.
-        
+
            if   ev.code == evdev.ecodes.KEY_PAUSE and ev.value == 1:
               #
               # Exit on pressing PAUSE.
@@ -82,7 +102,7 @@ async def handle_events(dev): # {{{
                 print(f'[4;1H     ')
                 left_alt_suppressed = False
                 write_hex([evdev.ecodes.KEY_E, evdev.ecodes.KEY_4]) # ä
-          
+
            elif left_alt_suppressed and ev.code == evdev.ecodes.KEY_LEFTBRACE and ev.value == 1:
                 print(f'[4;1H     ')
                 left_alt_suppressed = False
@@ -112,11 +132,11 @@ async def handle_events(dev): # {{{
                 vdev.write(evdev.ecodes.EV_KEY, ev.code, ev.value)
                 print(f'[4;1H     ')
                 left_alt_suppressed = False
-                   
+
            else:
                 vdev.write(ev.type, ev.code, ev.value)
         # }}}
-        
+
         else:
           # All other events (also SYNs) are passed to uinput without modification:
             vdev.write(ev.type, ev.code, ev.value)
