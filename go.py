@@ -50,11 +50,6 @@ dv_ms = grab_1st_available_device([
    'USB OPTICAL MOUSE ',           # Note the final space
    'SYNA8004:00 06CB:CD8B Mouse']) # 'SYNA8004:00 06CB:CD8B Touchpad'
 
-# dv_ms = grab_device('USB OPTICAL MOUSE '                       ) # Note the final space
-# if dv_ms == None:
-#  # dv_ms = grab_device('SYNA8004:00 06CB:CD8B Touchpad')
-#    dv_ms = grab_device('SYNA8004:00 06CB:CD8B Mouse'   )
-
 if dv_kb == None or dv_ms == None:
    print('Either Mouse or Keyboard (or both) not found')
    sys.exit(1)
