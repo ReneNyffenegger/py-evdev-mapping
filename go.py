@@ -1,3 +1,4 @@
+# vim: foldmethod=marker foldmarker={{{,}}}
 import asyncio
 import atexit
 import evdev
@@ -30,15 +31,29 @@ def grab_device(dev_name): # {{{
 
 # }}}
 
+def grab_1st_available_device(dev_names): # {{{
+    for dev_name in dev_names:
+        dv = grab_device(dev_name)
+        if dv != None:
+           return dv
 
-dv_kb = grab_device('LITEON Technology USB Multimedia Keyboard')
-if dv_kb == None:
-   dv_kb = grab_device('AT Translated Set 2 keyboard')
+    return None
 
-dv_ms = grab_device('USB OPTICAL MOUSE '                       ) # Note the final space
-if dv_ms == None:
- # dv_ms = grab_device('SYNA8004:00 06CB:CD8B Touchpad')
-   dv_ms = grab_device('SYNA8004:00 06CB:CD8B Mouse'   )
+# }}}
+
+dv_kb = grab_1st_available_device([
+  'Dell Dell Wired Multimedia Keyboard',
+  'LITEON Technology USB Multimedia Keyboard',
+  'AT Translated Set 2 keyboard'])
+
+dv_ms = grab_1st_available_device([
+   'USB OPTICAL MOUSE ',           # Note the final space
+   'SYNA8004:00 06CB:CD8B Mouse']) # 'SYNA8004:00 06CB:CD8B Touchpad'
+
+# dv_ms = grab_device('USB OPTICAL MOUSE '                       ) # Note the final space
+# if dv_ms == None:
+#  # dv_ms = grab_device('SYNA8004:00 06CB:CD8B Touchpad')
+#    dv_ms = grab_device('SYNA8004:00 06CB:CD8B Mouse'   )
 
 if dv_kb == None or dv_ms == None:
    print('Either Mouse or Keyboard (or both) not found')
@@ -80,14 +95,10 @@ async def handle_events(dev): # {{{
         if ev.type == evdev.ecodes.EV_KEY:  # {{{ Process key events.
 
            if   ev.code == evdev.ecodes.KEY_PAUSE and ev.value == 1:
-              #
-              # Exit on pressing PAUSE.
-              # Useful if that is your only keyboard. =)
-              # Also if you bind that script to PAUSE, it'll be a toggle.
-              #
+            #
+            #   Pressing pause exits immediatly.
+            #
                 sys.exit()
-              # break
-
 
            if   ev.code == evdev.ecodes.KEY_LEFTALT and ev.value == 1:
                 print(f'[4;1HL-ALT')
