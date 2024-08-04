@@ -9,7 +9,7 @@ pip install evdev
 
 sudo addgroup uinput
 #
-# Makeu /dev/uinput readable for users in group uinput:
+# Make /dev/uinput readable for users in group uinput:
 #
 sudo sh -c 'echo SUBSYSTEM==\"misc\", KERNEL==\"uinput\", MODE=\"0660\", GROUP=\"uinput\" > /etc/udev/rules.d/99-input.rules'
 
