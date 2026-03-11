@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # vim: foldmethod=marker foldmarker={{{,}}}
 import asyncio
 import atexit
@@ -48,7 +49,8 @@ dv_kb = grab_1st_available_device([
 
 dv_ms = grab_1st_available_device([
    'USB OPTICAL MOUSE ',           # Note the final space
-   'SYNA8004:00 06CB:CD8B Mouse']) # 'SYNA8004:00 06CB:CD8B Touchpad'
+   'SYNA8004:00 06CB:CD8B Mouse',  #'SYNA8004:00 06CB:CD8B Touchpad'
+   'DELL0832:00 044E:1220 Mouse'])
 
 if dv_kb == None or dv_ms == None:
    print('Either Mouse or Keyboard (or both) not found')

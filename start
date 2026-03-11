@@ -3,4 +3,4 @@
 dir="$(dirname "$(readlink -f "$0")")"
 
 . $dir/virt-env/bin/activate
-  $dir/virt-env/bin/python3 $dir/go.py
+  $dir/go.py
