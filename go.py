@@ -23,7 +23,7 @@ def grab_device(dev_name): # {{{
   #
     dev.grab()
   #
-  # When this script stope, the device is allowed (yea, even should)
+  # When this script stops, the device is allowed (yea, even should)
   # emit the events again:
   #
     atexit.register(dev.ungrab)
